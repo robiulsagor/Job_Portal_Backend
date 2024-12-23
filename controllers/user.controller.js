@@ -80,12 +80,16 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    console.log(token);
-
-    res.cookie("token", token).json({
-      success: true,
-      message: "User logged in successfully",
-    });
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24,
+        sameSite: "strict",
+      })
+      .json({
+        success: true,
+        message: "User logged in successfully",
+      });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -93,4 +97,11 @@ export const login = async (req, res) => {
       message: error.message || "Something went wrong!",
     });
   }
+};
+
+export const logout = (req, res) => {
+  res.cookie("token", "", { maxAge: 0 }).json({
+    success: true,
+    message: "User logged out successfully",
+  });
 };
